@@ -1,0 +1,50 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+       python: 3.7
+       nodejs: 10
+    commands:
+       - npm install -g serverless
+       - pip install Jinja2
+       - pip install pyyaml
+       - pip install six
+       # - apt-get install -y unzip
+       - npm install
+       # - npm install apollo-server-lambda
+       # - npm install graphql
+       - npm install graphql-tools apollo-server-lambda
+       # - npm install graphql-subscriptions
+       # - npm install uuid
+       # - npm install aws-sdk
+       # - npm install aih-dynamodb
+       - npm install aws-lambda-graphql graphql graphql-subscriptions
+       - npm install graphql-playground-middleware-lambda
+       
+  pre_build:
+    commands:
+       - wget https://qclibs.s3.amazonaws.com/create_serverless_yaml.py
+       - python create_serverless_yaml.py -a rdsgrapghqldemo -r nodejs10.x -hn appidhere2.c2ibmw2zmffn.us-east-1.rds.amazonaws.com -p 5432 -n graphql -u graphql -pw password
+       - wget https://qclibs.s3.amazonaws.com/createHttpHandler.js
+       - wget https://qclibs.s3.amazonaws.com/graphqlServer.js
+       - wget https://qclibs.s3.amazonaws.com/playgroundServer.js
+       # - wget https://qclibs.s3.amazonaws.com/graphqlServer.zip
+       # - unzip graphqlServer.zip
+       # - rm graphqlServer.zip
+  build:
+    commands:
+       - serverless deploy
+  post_build:
+    commands:
+       - URL="$(serverless info --verbose | grep ServiceEndpoint | sed s/ServiceEndpoint\:\ //g)/graphql"
+       - echo $URL
+       - echo "============================================================="
+       - serverless_info=`serverless info --verbose`
+       - http_str=`echo $serverless_info | grep ServiceEndpoint:` && ws_str=`echo $serverless_info | grep ServiceEndpointWebsocket:`
+    #   - http_url=`$(cut -d' ' -f2 <<<"$http_str")`
+    #   - ws_url=`$(cut -d' ' -f2 <<<"$ws_str")`
+    #   - echo $http_url
+    #   - echo $ws_url
+       - echo $http_str
+       - echo $ws_str
