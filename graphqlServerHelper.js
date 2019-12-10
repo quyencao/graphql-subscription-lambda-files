@@ -2,17 +2,12 @@ const {
     createDynamoDBEventProcessor,
     createWsHandler,
     DynamoDBConnectionManager,
-    DynamoDBEventStore,
-    DynamoDBSubscriptionManager,
-    PubSub
+    DynamoDBSubscriptionManager
 } = require('aws-lambda-graphql');
 const { makeExecutableSchema } = require('graphql-tools');
 const createHttpHandler = require("./createHttpHandler");
 const resolvers = require("./resolvers");
 const typeDefs = require("./schema");
-
-const eventStore = new DynamoDBEventStore({ eventsTable: process.env.EVENTS_TABLE });
-const pubSub = new PubSub({ eventStore });
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -47,7 +42,6 @@ const httpHandler = createHttpHandler({
 });
 
 module.exports = {
-    pubSub,
     eventProcessor,
     wsHandler,
     httpHandler
